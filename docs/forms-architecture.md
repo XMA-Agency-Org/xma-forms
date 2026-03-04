@@ -4,11 +4,12 @@
 
 The application provides three internal forms for collecting structured data with file attachments. Each form follows the same architectural pattern.
 
-| Form     | Route       | Purpose                    |
-| -------- | ----------- | -------------------------- |
-| Employee | `/employee` | Employee onboarding data   |
-| Customer | `/customer` | Customer intake data       |
-| Vendor   | `/vendor`   | Vendor registration data   |
+| Form         | Route                      | Purpose                       |
+| ------------ | -------------------------- | ----------------------------- |
+| Employee     | `/employee`                | Employee onboarding data      |
+| Customer     | `/customer`                | Customer intake data          |
+| Vendor       | `/vendor`                  | Vendor registration data      |
+| Daily Report | `/daily-report/[employee]` | Per-employee daily production |
 
 ## Route Structure
 
@@ -130,8 +131,50 @@ formData.append("attachment", fileValue);
 await axios.post(`/api/submit/${formType}`, formData);
 ```
 
+## Daily Report Form
+
+The daily report form uses a config-driven dynamic route at `/daily-report/[employee]` that renders a personalized form per employee.
+
+### How It Differs From Other Forms
+
+- **Dynamic route** — a single `[employee]` route replaces 9 separate form routes
+- **Composed schemas** — Zod schemas are built at runtime by merging core fields with role-specific fields
+- **Google Sheets integration** — submissions proxy through the API route to a Google Apps Script Web App (not Resend email)
+- **No file uploads** — data is sent as JSON, not FormData
+
+### Employee Configuration
+
+`app/daily-report/_lib/employee-config.ts` maps each employee slug to their name and roles. The form component reads this config to determine which section components to render and which schema to compose.
+
+### Schema Composition
+
+`app/daily-report/_lib/report-schema.ts` defines:
+- A core base schema (date, work mode, project, task category, hours, blockers, notes)
+- Five role sub-schemas (video-editor, videographer, script-writer, account-manager, graphic-designer)
+- A `composeSchema(roles)` function that spreads shapes together and applies cross-field refinements
+
+### Google Sheets Integration
+
+The submission flow differs from the email-based forms:
+
+```
+Client                          Next.js API                     Google Apps Script
+  |                               |                               |
+  |  1. POST JSON payload         |                               |
+  |  --------------------------->  |                               |
+  |                               |  2. Proxy to Apps Script URL  |
+  |                               |  -----------------------------> |
+  |                               |                               |  3. Write to employee tab
+  |                               |  <----------------------------- |
+  |  <---------------------------  |                               |
+  |  4. Show success/error state   |                               |
+```
+
+The Google Apps Script code is in `docs/google-apps-script.js` with deployment instructions.
+
 ## Environment Variables
 
-| Variable       | Purpose                  | Required |
-| -------------- | ------------------------ | -------- |
-| RESEND_API_KEY | Resend API key for email | Yes      |
+| Variable               | Purpose                                | Required |
+| ---------------------- | -------------------------------------- | -------- |
+| RESEND_API_KEY         | Resend API key for email               | Yes      |
+| GOOGLE_APPS_SCRIPT_URL | Google Apps Script Web App URL         | Yes (for daily report) |
