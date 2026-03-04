@@ -35,7 +35,7 @@ function flattenEntries(data: Record<string, unknown>) {
 
     entries.forEach((entry: Record<string, unknown>) => {
       rows.push({
-        Timestamp: new Date().toISOString(),
+        Timestamp: new Date().toISOString().split("T")[0],
         entryType,
         ...coreValues,
         ...entry,
@@ -46,7 +46,7 @@ function flattenEntries(data: Record<string, unknown>) {
 
   if (rows.length === 0) {
     rows.push({
-      Timestamp: new Date().toISOString(),
+      Timestamp: new Date().toISOString().split("T")[0],
       ...coreValues,
       ...flatFields,
     });
@@ -116,7 +116,9 @@ async function insertRecords(
     Object.entries(row).forEach(([key, value]) => {
       if (key === "date" && typeof value === "string") {
         const [dd, mm, yyyy] = value.split("/");
-        fields[key] = `${yyyy}-${mm}-${dd}T00:00:00.000Z`;
+        fields[key] = `${yyyy}-${mm}-${dd}`;
+      } else if (key === "Timestamp") {
+        fields[key] = value;
       } else {
         fields[key] = value !== undefined && value !== null ? String(value) : "";
       }
