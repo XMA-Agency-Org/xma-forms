@@ -107,6 +107,51 @@ async function createTable(
   });
 }
 
+async function getTableFields(tableName: string): Promise<string[]> {
+  const data = await airtableFetch(
+    `/meta/bases/${AIRTABLE_BASE_ID}/tables`
+  );
+  const table = (data.tables as { name: string; fields: { name: string }[] }[]).find(
+    (t) => t.name === tableName
+  );
+  return table ? table.fields.map((f) => f.name) : [];
+}
+
+async function addMissingFields(
+  tableName: string,
+  rows: Record<string, unknown>[]
+) {
+  const existingFields = await getTableFields(tableName);
+  const requiredFields = new Set<string>();
+  rows.forEach((row) => Object.keys(row).forEach((k) => requiredFields.add(k)));
+
+  const tableId = await getTableId(tableName);
+  for (const fieldName of requiredFields) {
+    if (!existingFields.includes(fieldName)) {
+      const fieldDef =
+        fieldName === "Timestamp" || fieldName === "date"
+          ? { name: fieldName, type: "date", options: { dateFormat: { name: "iso" } } }
+          : { name: fieldName, type: "singleLineText" };
+
+      await airtableFetch(
+        `/meta/bases/${AIRTABLE_BASE_ID}/tables/${tableId}/fields`,
+        { method: "POST", body: JSON.stringify(fieldDef) }
+      );
+    }
+  }
+}
+
+async function getTableId(tableName: string): Promise<string> {
+  const data = await airtableFetch(
+    `/meta/bases/${AIRTABLE_BASE_ID}/tables`
+  );
+  const table = (data.tables as { id: string; name: string }[]).find(
+    (t) => t.name === tableName
+  );
+  if (!table) throw new Error(`Table "${tableName}" not found`);
+  return table.id;
+}
+
 async function insertRecords(
   tableName: string,
   rows: Record<string, unknown>[]
@@ -163,6 +208,8 @@ export async function POST(request: Request) {
     const existingTables = await getExistingTables();
     if (!existingTables.includes(employeeName)) {
       await createTable(employeeName, rows);
+    } else {
+      await addMissingFields(employeeName, rows);
     }
 
     await insertRecords(employeeName, rows);
