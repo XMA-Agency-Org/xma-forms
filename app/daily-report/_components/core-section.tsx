@@ -5,8 +5,6 @@ import { FormField } from "@/components/form/form-field";
 import { FormSection } from "@/components/form/form-section";
 import { Textarea } from "@/components/ui/textarea";
 import { DateInput } from "@/components/ui/date-input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { WORK_MODES } from "../_lib/report-schema";
 
 export function CoreSection() {
   const {
@@ -24,17 +22,6 @@ export function CoreSection() {
           {...register("date")}
           variant={errors.date ? "error" : "default"}
         />
-      </FormField>
-
-      <FormField name="workMode" label="Work Mode" required>
-        <RadioGroup layout="horizontal">
-          {WORK_MODES.map((mode) => (
-            <label key={mode} className="flex items-center gap-2 cursor-pointer">
-              <RadioGroupItem {...register("workMode")} value={mode} />
-              <span className="text-sm">{mode}</span>
-            </label>
-          ))}
-        </RadioGroup>
       </FormField>
 
       <div className="sm:col-span-2">

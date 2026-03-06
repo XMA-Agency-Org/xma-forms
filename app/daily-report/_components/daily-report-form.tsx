@@ -25,6 +25,7 @@ import { VideographerSection } from "./videographer-section";
 import { ScriptWriterSection } from "./script-writer-section";
 import { AccountManagerSection } from "./account-manager-section";
 import { GraphicDesignerSection } from "./graphic-designer-section";
+import { SalesmanSection } from "./salesman-section";
 import { FormActions } from "@/components/form/form-actions";
 
 interface DailyReportFormProps {
@@ -37,6 +38,7 @@ const roleSectionMap: Record<EmployeeRole, () => React.ReactNode> = {
   "script-writer": () => <ScriptWriterSection />,
   "account-manager": () => <AccountManagerSection />,
   "graphic-designer": () => <GraphicDesignerSection />,
+  salesman: () => <SalesmanSection />,
 };
 
 export function DailyReportForm({ config }: DailyReportFormProps) {

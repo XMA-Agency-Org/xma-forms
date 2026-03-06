@@ -3,7 +3,8 @@ export type EmployeeRole =
   | "videographer"
   | "script-writer"
   | "account-manager"
-  | "graphic-designer";
+  | "graphic-designer"
+  | "salesman";
 
 export type EmployeeSlug =
   | "kian"
@@ -14,7 +15,10 @@ export type EmployeeSlug =
   | "borna"
   | "pouria"
   | "faez"
-  | "zahir";
+  | "zahir"
+  | "kian-khamoushi"
+  | "mark"
+  | "rene";
 
 export interface EmployeeConfig {
   name: string;

@@ -1,19 +1,16 @@
 import { z } from "zod";
 import type { EmployeeRole } from "./report-types";
 
-const WORK_MODES = ["Remote", "Office", "Hybrid"] as const;
-
 const PROJECTS = ["Client A", "Client B", "Internal", "Other"] as const;
 
 const YES_NO = ["Yes", "No"] as const;
 
-export { WORK_MODES, PROJECTS, YES_NO };
+export { PROJECTS, YES_NO };
 
 const coreBaseSchema = z.object({
   date: z
     .string()
     .regex(/^\d{2}\/\d{2}\/\d{4}$/, "Date must be in DD/MM/YYYY format"),
-  workMode: z.enum(WORK_MODES, { message: "Work mode is required" }),
   notes: z.string().optional(),
 });
 
@@ -76,12 +73,18 @@ export const graphicDesignerSchema = z.object({
   newConceptsDeveloped: z.coerce.number().min(0).optional(),
 });
 
+export const salesmanSchema = z.object({
+  outreaches: z.coerce.number().min(0, "Outreaches is required"),
+  appointmentsSet: z.coerce.number().min(0, "Appointments set is required"),
+});
+
 const roleSchemaMap: Record<EmployeeRole, z.ZodObject<z.ZodRawShape>> = {
   "video-editor": videoEditorSchema as unknown as z.ZodObject<z.ZodRawShape>,
   videographer: videographerSchema as unknown as z.ZodObject<z.ZodRawShape>,
   "script-writer": scriptWriterSchema as unknown as z.ZodObject<z.ZodRawShape>,
   "account-manager": accountManagerSchema as unknown as z.ZodObject<z.ZodRawShape>,
   "graphic-designer": graphicDesignerSchema as unknown as z.ZodObject<z.ZodRawShape>,
+  salesman: salesmanSchema as unknown as z.ZodObject<z.ZodRawShape>,
 };
 
 export function composeSchema(roles: EmployeeRole[]) {

@@ -4,7 +4,7 @@ const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const AIRTABLE_API = "https://api.airtable.com/v0";
 
-const CORE_FIELDS = ["date", "workMode", "notes"];
+const CORE_FIELDS = ["date", "notes"];
 const META_FIELDS = ["employee", "employeeName"];
 const ENTRY_ARRAYS = ["shootEntries", "editingEntries", "accountEntries"];
 

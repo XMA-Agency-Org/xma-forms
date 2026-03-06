@@ -46,6 +46,21 @@ export const employeeConfigs: Record<EmployeeSlug, EmployeeConfig> = {
     slug: "zahir",
     roles: [],
   },
+  "kian-khamoushi": {
+    name: "Kian Khamoushi",
+    slug: "kian-khamoushi",
+    roles: [],
+  },
+  rene: {
+    name: "Rene",
+    slug: "rene",
+    roles: ["salesman"],
+  },
+  mark: {
+    name: "Mark",
+    slug: "mark",
+    roles: [],
+  },
 };
 
 export function getEmployeeConfig(slug: string): EmployeeConfig | undefined {
